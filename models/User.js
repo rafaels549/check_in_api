@@ -1,5 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
-const sequelize = require('../config/database');  // Importe sua instância do Sequelize
+const sequelize = require('../config/database');
+const Estabilishment = require('./Estabilishment'); 
 
 const User = sequelize.define('User', {
   fullName: {
@@ -22,6 +23,16 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  user_role: {
+    type: DataTypes.ENUM('ADMIN', 'USER', 'DEVELOPER'),
+    allowNull: false,
+    defaultValue: 'USER',
+  },
 });
 
+User.hasMany(Estabilishment, {
+  foreignKey: 'user_id',
+  as: 'establishments',
+});
+Estabilishment.belongsTo(User);
 module.exports = User;
