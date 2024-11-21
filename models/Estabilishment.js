@@ -11,6 +11,14 @@ const Estabilishment = sequelize.define("Estabilishment", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  cnpj: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true, 
+    validate: {
+      is: /^[0-9]{14}$/,
+    },
+  },
   user_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -20,7 +28,5 @@ const Estabilishment = sequelize.define("Estabilishment", {
     },
   },
 });
-
-
 
 module.exports = Estabilishment;
