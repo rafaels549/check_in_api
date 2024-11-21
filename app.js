@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const bcrypt = require('bcrypt');
 const User = require('./models/User');
 const sequelize = require('./config/database');
@@ -6,8 +7,11 @@ const Estabilishment = require("./models/Estabilishment");
 const { check, validationResult } = require('express-validator');
 
 const app = express();
-const port = 3000;
+const port = 3001;
 
+app.use(cors({
+  origin: 'http://localhost:3000'  // Allow only requests from localhost:3000
+}));
 app.use(express.json());
 
 app.post(
