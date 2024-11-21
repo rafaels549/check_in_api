@@ -77,5 +77,38 @@ const registerEstabilishment = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-module.exports = { registerEstabilishment };
+const getAllEstabilishments = async (req, res) => {
+    const { page = 1, limit = 10, address = '' } = req.query;
+  
+    try {
+      const offset = (page - 1) * limit;
+  
+      const { count, rows: estabilishments } = await Estabilishment.findAndCountAll({
+        where: {
+          address: {
+            [Sequelize.Op.like]: `%${address}%`,
+          },
+        },
+        include: {
+          model: User,
+          attributes: ['id', 'fullName', 'email', 'phoneNumber', 'user_role'],
+        },
+        limit: parseInt(limit, 10),
+        offset: parseInt(offset, 10),
+      });
+  
+      const totalPages = Math.ceil(count / limit);
+  
+      res.status(200).json({
+        message: "Estabelecimentos recuperados com sucesso.",
+        totalItems: count,
+        totalPages,
+        currentPage: parseInt(page, 10),
+        itemsPerPage: parseInt(limit, 10),
+        estabilishments,
+      });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  };
+module.exports = { registerEstabilishment , getAllEstabilishments };

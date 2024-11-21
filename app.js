@@ -42,6 +42,11 @@ app.post(
   estabilishmentController.registerEstabilishment
 );
 
+app.post(
+  "/estabilishment",
+  estabilishmentController.getAllEstabilishments
+);
+
 sequelize.sync().then(() => {
   console.log('Banco de dados sincronizado');
   app.listen(port, () => {
