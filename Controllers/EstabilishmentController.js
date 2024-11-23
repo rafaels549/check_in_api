@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const Estabilishment = require('../models/Estabilishment');
+const Product = require('../models/Product');
 const axios = require('axios');
 
 const validateCNPJ = async (cnpj) => {
@@ -111,4 +112,23 @@ const getAllEstabilishments = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
-module.exports = { registerEstabilishment , getAllEstabilishments };
+
+  const createProduct = async (req, res) => {
+    const { name, price, image } = req.body;
+  
+    if (!name || !price) {
+      return res.status(400).json({ message: 'Nome e preço são obrigatórios.' });
+    }
+  
+    try {
+      const product = await Product.create({ name, price, image });
+      return res.status(201).json({
+        message: 'Produto criado com sucesso!',
+        product: { id: product.id, name: product.name, price: product.price, image: product.image },
+      });
+    } catch (error) {
+      return res.status(500).json({ message: 'Erro ao criar o produto.' });
+    }
+  };
+  
+module.exports = { registerEstabilishment , getAllEstabilishments, createProduct };

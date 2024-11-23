@@ -47,6 +47,11 @@ app.post(
   estabilishmentController.getAllEstabilishments
 );
 
+app.post(
+  "/estabilishment/create-product",
+  estabilishmentController.createProduct
+);
+
 sequelize.sync().then(() => {
   console.log('Banco de dados sincronizado');
   app.listen(port, () => {
@@ -56,4 +61,6 @@ sequelize.sync().then(() => {
   console.error('Erro ao sincronizar tabelas:', error);
 });
 
-module.exports = app;
+
+
+
