@@ -4,6 +4,7 @@ const sequelize = require('./config/database');
 const userController = require('./Controllers/UserController');
 const estabilishmentController = require('./Controllers/EstabilishmentController');
 const authController = require('./Controllers/AuthController');
+const upload = require('upload');
 const app = express();
 const port = 3000;
 
@@ -63,6 +64,7 @@ app.post(
     check("phoneNumber").matches(/^\d{11}$/).withMessage("O número de telefone deve conter exatamente 11 dígitos."),
     check("address").notEmpty().withMessage("O endereço é obrigatório."),
   ],
+  upload.single('image'),
   estabilishmentController.registerEstabilishment
 );
 

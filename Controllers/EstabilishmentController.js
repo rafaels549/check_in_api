@@ -5,6 +5,7 @@ const Estabilishment = require('../models/Estabilishment');
 const Product = require('../models/Product');
 const axios = require('axios');
 
+
 const validateCNPJ = async (cnpj) => {
   try {
     const response = await axios.get(`https://www.receitaws.com.br/v1/cnpj/${cnpj}`);
@@ -24,6 +25,7 @@ const registerEstabilishment = async (req, res) => {
   }
 
   const { name, fullName, email, password, phoneNumber, address, cnpj } = req.body;
+  const image = req.file ? `/uploads/${req.file.filename}` : null;
 
   try {
     const existingEstabilishment = await Estabilishment.findOne({ where: { cnpj } });
@@ -56,6 +58,7 @@ const registerEstabilishment = async (req, res) => {
       address,
       cnpj,
       user_id: user.id,
+      image,
     });
 
     res.status(201).json({
@@ -65,6 +68,7 @@ const registerEstabilishment = async (req, res) => {
         name: estabilishment.name,
         address: estabilishment.address,
         cnpj: estabilishment.cnpj,
+        image: estabilishment.image,
         user: {
           id: user.id,
           fullName: user.fullName,
