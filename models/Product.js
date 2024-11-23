@@ -15,6 +15,14 @@ const Product = sequelize.define('Product', {
     type: DataTypes.STRING,  
     allowNull: true,      
   },
+  ownerId: {  
+    type: DataTypes.INTEGER,
+    references: {
+      model: 'Estabilishments',
+      key: 'id', 
+    },
+    allowNull: false, 
+  },
 });
 
 module.exports = Product;

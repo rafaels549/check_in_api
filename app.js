@@ -9,6 +9,29 @@ const port = 3000;
 
 app.use(express.json());
 
+const admin = async (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ message: 'Token não fornecido.' });
+  }
+  const establishment = await Establishment.findOne({
+    where: { user_id: user.id }
+  });
+
+  if (!establishment) {
+    return res.status(404).json({ message: 'Estabelecimento não encontrado para o usuário.' });
+  }
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ message: 'Token inválido ou expirado.' });
+    }
+
+    req.user = decoded;
+    next();
+  });
+};
+
 app.post(
   "/user/register",
   [
@@ -18,6 +41,7 @@ app.post(
     check("confirmPassword").custom((value, { req }) => value === req.body.password).withMessage("As senhas não coincidem"),
     check("phoneNumber").matches(/^\d{11}$/).withMessage("O número de telefone deve conter exatamente 11 dígitos"),
   ],
+ 
   userController.registerUser
 );
 
@@ -49,6 +73,7 @@ app.post(
 
 app.post(
   "/estabilishment/create-product",
+  admin,
   estabilishmentController.createProduct
 );
 

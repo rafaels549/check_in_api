@@ -115,20 +115,33 @@ const getAllEstabilishments = async (req, res) => {
 
   const createProduct = async (req, res) => {
     const { name, price, image } = req.body;
+    const ownerId = req.user.id; // Pegando o id do usuário autenticado
   
     if (!name || !price) {
       return res.status(400).json({ message: 'Nome e preço são obrigatórios.' });
     }
   
     try {
-      const product = await Product.create({ name, price, image });
+      const product = await Product.create({ 
+        name, 
+        price, 
+        image, 
+        ownerId  
+      });
+  
       return res.status(201).json({
         message: 'Produto criado com sucesso!',
-        product: { id: product.id, name: product.name, price: product.price, image: product.image },
+        product: { 
+          id: product.id, 
+          name: product.name, 
+          price: product.price, 
+          image: product.image 
+        },
       });
     } catch (error) {
       return res.status(500).json({ message: 'Erro ao criar o produto.' });
     }
   };
+  
   
 module.exports = { registerEstabilishment , getAllEstabilishments, createProduct };
