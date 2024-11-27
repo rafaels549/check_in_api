@@ -11,6 +11,18 @@ const Product = sequelize.define('Product', {
     type: DataTypes.FLOAT,
     allowNull: false,
   },
+  image: {
+    type: DataTypes.STRING,  
+    allowNull: true,      
+  },
+  ownerId: {  
+    type: DataTypes.INTEGER,
+    references: {
+      model: 'Estabilishments',
+      key: 'id', 
+    },
+    allowNull: false, 
+  },
 });
 
 module.exports = Product;

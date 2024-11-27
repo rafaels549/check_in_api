@@ -1,6 +1,7 @@
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 const Estabilishment = require('./Estabilishment'); 
+const Product = require('./Product');
 
 const User = sequelize.define('User', {
   fullName: {
@@ -35,4 +36,9 @@ User.hasMany(Estabilishment, {
   as: 'establishments',
 });
 Estabilishment.belongsTo(User);
+User.hasMany(Product,{
+   foreignKey:'ownerId',
+   as:'products'
+});
+Product.belongsTo(User);
 module.exports = User;

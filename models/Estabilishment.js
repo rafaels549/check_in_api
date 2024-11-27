@@ -19,6 +19,10 @@ const Estabilishment = sequelize.define("Estabilishment", {
       is: /^[0-9]{14}$/,
     },
   },
+  image: { 
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   user_id: {
     type: DataTypes.INTEGER,
     allowNull: false,

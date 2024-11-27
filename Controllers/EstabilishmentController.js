@@ -2,7 +2,10 @@ const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const Estabilishment = require('../models/Estabilishment');
+const Product = require('../models/Product');
 const axios = require('axios');
+const Sequelize = require('sequelize');
+
 
 const validateCNPJ = async (cnpj) => {
   try {
@@ -23,6 +26,7 @@ const registerEstabilishment = async (req, res) => {
   }
 
   const { name, fullName, email, password, phoneNumber, address, cnpj } = req.body;
+  const image = req.file ? `/uploads/${req.file.filename}` : null;
 
   try {
     const existingEstabilishment = await Estabilishment.findOne({ where: { cnpj } });
@@ -55,6 +59,7 @@ const registerEstabilishment = async (req, res) => {
       address,
       cnpj,
       user_id: user.id,
+      image,
     });
 
     res.status(201).json({
@@ -64,6 +69,7 @@ const registerEstabilishment = async (req, res) => {
         name: estabilishment.name,
         address: estabilishment.address,
         cnpj: estabilishment.cnpj,
+        image: estabilishment.image,
         user: {
           id: user.id,
           fullName: user.fullName,
@@ -111,4 +117,62 @@ const getAllEstabilishments = async (req, res) => {
       res.status(500).json({ error: error.message });
     }
   };
-module.exports = { registerEstabilishment , getAllEstabilishments };
+
+  const createProduct = async (req, res) => {
+    const { name, price, image } = req.body;
+    const ownerId = req.user.id; // Pegando o id do usuário autenticado
+  
+    if (!name || !price) {
+      return res.status(400).json({ message: 'Nome e preço são obrigatórios.' });
+    }
+  
+    try {
+      const product = await Product.create({ 
+        name, 
+        price, 
+        image, 
+        ownerId  
+      });
+  
+      return res.status(201).json({
+        message: 'Produto criado com sucesso!',
+        product: { 
+          id: product.id, 
+          name: product.name, 
+          price: product.price, 
+          image: product.image 
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({ message: 'Erro ao criar o produto.' });
+    }
+  };
+
+  const getEstabilishmentById = async (req, res) => {
+    const { id } = req.params; // Pega o ID do estabelecimento da URL
+    const idNumber = Number(id);
+    try {
+      // Busca o estabelecimento pelo ID
+      const estabilishment = await Estabilishment.findByPk(idNumber, {
+        include: {
+          model: User, // Inclui informações do usuário associado
+          attributes: ['id', 'fullName', 'email', 'phoneNumber', 'user_role'],
+        },
+      });
+  
+      // Verifica se o estabelecimento foi encontrado
+      if (!estabilishment) {
+        return res.status(404).json({ message: 'Estabelecimento não encontrado.', id: id});
+      }
+  
+      return res.status(200).json({
+        message: 'Estabelecimento recuperado com sucesso.',
+        estabilishment,
+      });
+    } catch (error) {
+      return res.status(500).json({ message: 'Erro ao buscar o estabelecimento.', error: error.message });
+    }
+  };
+  
+  
+module.exports = { registerEstabilishment , getAllEstabilishments, createProduct, getEstabilishmentById };
