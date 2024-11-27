@@ -4,7 +4,8 @@ const sequelize = require('./config/database');
 const userController = require('./Controllers/UserController');
 const estabilishmentController = require('./Controllers/EstabilishmentController');
 const authController = require('./Controllers/AuthController');
-const upload = require('upload');
+const path = require('path');
+const upload = require('./upload');
 const app = express();
 const port = 3000;
 
@@ -67,6 +68,23 @@ app.post(
   upload.single('image'),
   estabilishmentController.registerEstabilishment
 );
+
+app.post("/upload", upload.single('image'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'Nenhum arquivo enviado.' });
+    }
+
+    const filePath = path.join(__dirname, 'uploads', req.file.filename);
+    res.status(200).json({
+      message: 'Imagem enviada com sucesso!',
+      file: req.file,
+      filePath: filePath,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Erro ao enviar a imagem.', error: error.message });
+  }
+});
 
 app.post(
   "/estabilishment",
