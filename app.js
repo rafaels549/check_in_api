@@ -1,15 +1,25 @@
 const express = require('express');
+
+const cors = require('cors');
+
+
 const { check } = require('express-validator');
+
 const sequelize = require('./config/database');
 const userController = require('./Controllers/UserController');
 const estabilishmentController = require('./Controllers/EstabilishmentController');
 const authController = require('./Controllers/AuthController');
-const path = require('path');
 const upload = require('./upload');
 const app = express();
-const port = 3000;
 
+
+const port = 3001;
+
+app.use(cors({
+  origin: 'http://localhost:3000'  // Allow only requests from localhost:3000
+}));
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const admin = async (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
@@ -57,6 +67,7 @@ app.post(
 );
 app.post(
   "/estabilishment/register",
+  upload.single('image'),
   [
     check("name").notEmpty().withMessage("O nome do estabelecimento é obrigatório."),
     check("email").isEmail().withMessage("E-mail inválido."),
@@ -65,26 +76,11 @@ app.post(
     check("phoneNumber").matches(/^\d{11}$/).withMessage("O número de telefone deve conter exatamente 11 dígitos."),
     check("address").notEmpty().withMessage("O endereço é obrigatório."),
   ],
-  upload.single('image'),
+
+  
   estabilishmentController.registerEstabilishment
 );
 
-app.post("/upload", upload.single('image'), (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: 'Nenhum arquivo enviado.' });
-    }
-
-    const filePath = path.join(__dirname, 'uploads', req.file.filename);
-    res.status(200).json({
-      message: 'Imagem enviada com sucesso!',
-      file: req.file,
-      filePath: filePath,
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Erro ao enviar a imagem.', error: error.message });
-  }
-});
 
 app.post(
   "/estabilishment",
@@ -94,8 +90,15 @@ app.post(
 app.post(
   "/estabilishment/create-product",
   admin,
+  upload.single("image"),
   estabilishmentController.createProduct
 );
+app.post(
+  '/estabilishment/create-qrcode',
+  admin,
+  estabilishmentController.createQrcode
+);
+app.get("/estabilishment/:id", estabilishmentController.getEstabilishmentById);
 
 sequelize.sync().then(() => {
   console.log('Banco de dados sincronizado');

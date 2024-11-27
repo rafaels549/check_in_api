@@ -4,6 +4,9 @@ const User = require('../models/User');
 const Estabilishment = require('../models/Estabilishment');
 const Product = require('../models/Product');
 const axios = require('axios');
+const Sequelize = require('sequelize');
+const QRCode = require('qrcode');
+const QrCode = require("../models/QrCode");
 
 
 const validateCNPJ = async (cnpj) => {
@@ -118,9 +121,9 @@ const getAllEstabilishments = async (req, res) => {
   };
 
   const createProduct = async (req, res) => {
-    const { name, price, image } = req.body;
+    const { name, price } = req.body;
     const ownerId = req.user.id; // Pegando o id do usuário autenticado
-  
+    const image = req.file ? `/uploads/${req.file.filename}` : null;
     if (!name || !price) {
       return res.status(400).json({ message: 'Nome e preço são obrigatórios.' });
     }
@@ -146,6 +149,60 @@ const getAllEstabilishments = async (req, res) => {
       return res.status(500).json({ message: 'Erro ao criar o produto.' });
     }
   };
+  const createQrcode = async (req, res) => {
+    try {
+      const { id, endereco, nome } = req.body;
+  
+      if (!id || !endereco || !nome) {
+        return res.status(400).json({ error: "ID, endereço e nome são obrigatórios." });
+      }
+  
+      const estabilishment = await Estabilishment.findByPk(id);
+  
+      if (!estabilishment) {
+        return res.status(404).json({ error: "Estabelecimento não encontrado." });
+      }
+  
+      const qrData = `ID: ${id}\nEndereço: ${endereco}\nNome: ${nome}`;
+      const qrCodeImage = await QRCode.toDataURL(qrData);
+  
+      const newQrCode = await QrCode.create({
+        qr_code_data: qrData,
+        estabilishment_id: id,
+      });
+  
+      res.status(201).json({ message: "QR Code criado com sucesso!", qrCode: qrCodeImage, data: newQrCode });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Erro ao gerar o QR Code." });
+    }
+  };
+  
+  const getEstabilishmentById = async (req, res) => {
+    const { id } = req.params; // Pega o ID do estabelecimento da URL
+    const idNumber = Number(id);
+    try {
+      // Busca o estabelecimento pelo ID
+      const estabilishment = await Estabilishment.findByPk(idNumber, {
+        include: {
+          model: User, // Inclui informações do usuário associado
+          attributes: ['id', 'fullName', 'email', 'phoneNumber', 'user_role'],
+        },
+      });
+  
+      // Verifica se o estabelecimento foi encontrado
+      if (!estabilishment) {
+        return res.status(404).json({ message: 'Estabelecimento não encontrado.', id: id});
+      }
+  
+      return res.status(200).json({
+        message: 'Estabelecimento recuperado com sucesso.',
+        estabilishment,
+      });
+    } catch (error) {
+      return res.status(500).json({ message: 'Erro ao buscar o estabelecimento.', error: error.message });
+    }
+  };
   
   
-module.exports = { registerEstabilishment , getAllEstabilishments, createProduct };
+module.exports = { registerEstabilishment , getAllEstabilishments, createProduct, getEstabilishmentById, createQrcode };
