@@ -182,7 +182,7 @@ const getAllEstabilishments = async (req, res) => {
     const { id } = req.params; // Pega o ID do estabelecimento da URL
     const idNumber = Number(id);
     try {
-      // Busca o estabelecimento pelo ID
+     
       const estabilishment = await Estabilishment.findByPk(idNumber, {
         include: {
           model: User, // Inclui informações do usuário associado
