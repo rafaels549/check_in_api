@@ -34,3 +34,5 @@ CheckIn.belongsTo(User);
 
 Establishment.hasMany(CheckIn, { foreignKey: "establishment_id", as: "check_ins" });
 CheckIn.belongsTo(Estabilishment); 
+
+module.exports = CheckIn;

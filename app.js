@@ -98,6 +98,11 @@ app.post(
   admin,
   estabilishmentController.createQrcode
 );
+app.post(
+  '/estabilishment/create-checkin',
+  admin,
+  estabilishmentController.createCheckIn
+);
 app.get("/estabilishment/:id", estabilishmentController.getEstabilishmentById);
 
 sequelize.sync().then(() => {
