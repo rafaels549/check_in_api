@@ -1,7 +1,7 @@
 const { Sequelize, DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 const User = require("./User");
-const Estabilishment = require("./Estabilishment");
+
 
 const CheckIn = sequelize.define("check_in",{
    user_id:{
@@ -17,7 +17,7 @@ const CheckIn = sequelize.define("check_in",{
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-        model: Estabilishment,
+        model: 'Estabilishments',
         key: 'id',
     },
     onDelete: 'CASCADE',
@@ -29,10 +29,10 @@ active:{
 }
 
 })
-User.hasMany(CheckIn, { foreignKey: "user_id", as: "check_ins" }); 
+/* User.hasMany(CheckIn, { foreignKey: "user_id", as: "check_ins" }); 
 CheckIn.belongsTo(User);
 
 Estabilishment.hasMany(CheckIn, { foreignKey: "establishment_id", as: "check_ins" });
-CheckIn.belongsTo(Estabilishment); 
+CheckIn.belongsTo(Estabilishment);  */
 
 module.exports = CheckIn;

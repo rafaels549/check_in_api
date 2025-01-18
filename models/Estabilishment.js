@@ -1,9 +1,8 @@
-const { Sequelize, DataTypes } = require("sequelize");
-const sequelize = require("../config/database");
-const User = require('./User'); // Garantir que está importando o modelo User corretamente
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const Estabilishment = sequelize.define("Estabilishment", {
-  name: { 
+const Estabilishment = sequelize.define('Estabilishment', {
+  name: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -14,12 +13,12 @@ const Estabilishment = sequelize.define("Estabilishment", {
   cnpj: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true, 
+    unique: true,
     validate: {
       is: /^[0-9]{14}$/,
     },
   },
-  image: { 
+  image: {
     type: DataTypes.STRING,
     allowNull: true,
   },
@@ -27,7 +26,7 @@ const Estabilishment = sequelize.define("Estabilishment", {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: User, 
+      model: 'Users', // Use o nome da tabela no banco de dados
       key: 'id',
     },
   },

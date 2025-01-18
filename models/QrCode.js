@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
-const Estabilishment = require("./Estabilishment");
+
 
 const QrCode = sequelize.define("QrCode", {
   qr_code_data: {
@@ -15,7 +15,7 @@ const QrCode = sequelize.define("QrCode", {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: Estabilishment,
+      model: 'Estabilishments',
       key: "id",
     },
   },
@@ -29,11 +29,11 @@ const QrCode = sequelize.define("QrCode", {
   timestamps: false,
 });
 
-
+/* 
 QrCode.belongsTo(Estabilishment);
 Estabilishment.hasMany(QrCode, {
   foreignKey: "estabilishment_id",
   as: "qrCodes", // Alias correto
-});
+}); */
 
 module.exports = QrCode;

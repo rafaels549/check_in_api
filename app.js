@@ -13,6 +13,7 @@ const authController = require('./Controllers/AuthController');
 const upload = require('./upload');
 const app = express();
 const Estabilishment = require('./models/Estabilishment');
+const setupAssociations = require('./models/setupAssociations');
 
 
 const port = 3001;
@@ -108,6 +109,9 @@ app.post(
 app.get("/estabilishment/:id", estabilishmentController.getEstabilishmentById);
 
 app.get('/auth/user', authController.getAuthenticatedUser);
+
+// Configurar associações
+setupAssociations();
 
 sequelize.sync().then(() => {
   console.log('Banco de dados sincronizado');

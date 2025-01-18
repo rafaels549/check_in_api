@@ -1,6 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database'); 
-const Estabilishment = require('./Estabilishment');
+
 
 const Product = sequelize.define('Product', {
   name: {
@@ -19,7 +19,7 @@ const Product = sequelize.define('Product', {
   ownerId: {  
     type: DataTypes.INTEGER,
     references: {
-      model: Estabilishment,
+      model: 'Estabilishments',
       key: 'id', 
     },
     allowNull: false, 
