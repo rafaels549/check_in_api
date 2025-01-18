@@ -100,6 +100,11 @@ app.post(
  
   estabilishmentController.createQrcode
 );
+app.post(
+  '/estabilishment/create-checkin',
+  admin,
+  estabilishmentController.createCheckIn
+);
 app.get("/estabilishment/:id", estabilishmentController.getEstabilishmentById);
 
 app.get('/auth/user', authController.getAuthenticatedUser);

@@ -7,6 +7,7 @@ const axios = require('axios');
 const Sequelize = require('sequelize');
 const QRCode = require('qrcode');
 const QrCode = require("../models/QrCode");
+const CheckIn = require('../models/Check_in');
 
 
 const validateCNPJ = async (cnpj) => {
@@ -200,7 +201,7 @@ const getAllEstabilishments = async (req, res) => {
     const { id } = req.params; // Pega o ID do estabelecimento da URL
     const idNumber = Number(id);
     try {
-      // Busca o estabelecimento pelo ID
+     
       const estabilishment = await Estabilishment.findByPk(idNumber, {
         include: [
           {
@@ -228,5 +229,20 @@ const getAllEstabilishments = async (req, res) => {
     }
   };
   
-  
-module.exports = { registerEstabilishment , getAllEstabilishments, createProduct, getEstabilishmentById, createQrcode };
+  const createCheckIn = async (req, res) => {
+         const {user_id, estabilishment_id} = req.params;
+   try{
+         const newCheckIn = CheckIn.create({
+                user_id : user_id,
+                estabilishment_id:estabilishment_id
+         })
+         res.status(200).json({
+              message:"Check in realizado com sucesso"
+         })
+        }catch(error){
+           res.status(500).json({
+             message:"Erro ao realizar check in"
+           })
+        }
+  };
+module.exports = { registerEstabilishment , getAllEstabilishments, createProduct, getEstabilishmentById, createQrcode, createCheckIn };

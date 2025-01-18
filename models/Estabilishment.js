@@ -27,7 +27,7 @@ const Estabilishment = sequelize.define("Estabilishment", {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'Users', 
+      model: User, 
       key: 'id',
     },
   },
