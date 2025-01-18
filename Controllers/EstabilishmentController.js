@@ -151,10 +151,11 @@ const getAllEstabilishments = async (req, res) => {
   };
   const createQrcode = async (req, res) => {
     try {
-      const { id, endereco, nome } = req.body;
+      const { id } = req.params; // Obtém o ID do estabelecimento pela URL
+      const { endereco, nome } = req.body;
   
-      if (!id || !endereco || !nome) {
-        return res.status(400).json({ error: "ID, endereço e nome são obrigatórios." });
+      if (!endereco || !nome) {
+        return res.status(400).json({ error: "Endereço e nome são obrigatórios." });
       }
   
       const estabilishment = await Estabilishment.findByPk(id);
@@ -163,31 +164,54 @@ const getAllEstabilishments = async (req, res) => {
         return res.status(404).json({ error: "Estabelecimento não encontrado." });
       }
   
+      // Verificar se já existe um QR Code para o estabelecimento
+      const existingQrCode = await QrCode.findOne({
+        where: { estabilishment_id: id },
+      });
+  
+      if (existingQrCode) {
+        // Apagar o QR Code antigo
+        await QrCode.destroy({
+          where: { estabilishment_id: id },
+        });
+      }
+  
+      // Criar o novo QR Code
       const qrData = `ID: ${id}\nEndereço: ${endereco}\nNome: ${nome}`;
       const qrCodeImage = await QRCode.toDataURL(qrData);
   
       const newQrCode = await QrCode.create({
         qr_code_data: qrData,
+        qr_code_image: qrCodeImage,
         estabilishment_id: id,
       });
   
-      res.status(201).json({ message: "QR Code criado com sucesso!", qrCode: qrCodeImage, data: newQrCode });
+      res.status(201).json({
+        message: "QR Code criado com sucesso!",
+        qrCode: qrCodeImage,
+        data: newQrCode,
+      });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Erro ao gerar o QR Code." });
     }
   };
-  
   const getEstabilishmentById = async (req, res) => {
     const { id } = req.params; // Pega o ID do estabelecimento da URL
     const idNumber = Number(id);
     try {
       // Busca o estabelecimento pelo ID
       const estabilishment = await Estabilishment.findByPk(idNumber, {
-        include: {
-          model: User, // Inclui informações do usuário associado
-          attributes: ['id', 'fullName', 'email', 'phoneNumber', 'user_role'],
-        },
+        include: [
+          {
+            model: User, // Inclui informações do usuário associado
+            attributes: ['id', 'fullName', 'email', 'phoneNumber', 'user_role'],
+          },
+          {
+            model: QrCode, // Inclui informações dos QR Codes associados
+            as: "qrCodes", // Use o alias definido na associação
+          },
+        ],
       });
   
       // Verifica se o estabelecimento foi encontrado

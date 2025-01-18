@@ -7,6 +7,10 @@ const QrCode = sequelize.define("QrCode", {
     type: DataTypes.TEXT,
     allowNull: false,
   },
+  qr_code_image: {
+    type: DataTypes.TEXT, // Para salvar o Base64 da imagem
+    allowNull: false,
+  },
   estabilishment_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -25,11 +29,11 @@ const QrCode = sequelize.define("QrCode", {
   timestamps: false,
 });
 
-Estabilishment.hasMany(QrCode, {
-  foreignKey: "estabilishment_id",
-  as: "qrCodes",
-});
 
 QrCode.belongsTo(Estabilishment);
+Estabilishment.hasMany(QrCode, {
+  foreignKey: "estabilishment_id",
+  as: "qrCodes", // Alias correto
+});
 
 module.exports = QrCode;

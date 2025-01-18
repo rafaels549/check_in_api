@@ -47,5 +47,37 @@ const login = async (req, res) => {
     res.status(500).json({ error: error });
   }
 };
+const getAuthenticatedUser = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
 
-module.exports = { login };
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Token não fornecido ou inválido." });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    const user = await User.findByPk(decoded.id, {
+      include: [
+        { association: "establishments" }, // Inclui os estabelecimentos relacionados
+        { association: "products" }, // Inclui os produtos relacionados
+      ],
+    });
+ 
+
+    if (!user) {
+      return res.status(404).json({ message: "Usuário não encontrado." });
+    }
+    
+    req.user = user; // Anexa o usuário autenticado ao objeto req
+    return res.status(200).json({
+      message: 'Usuário recuperado com sucesso.',
+      user,
+    });
+  } catch (error) {
+    return res.status(401).json({ message: "Token inválido ou expirado." });
+  }
+};
+module.exports = { login, getAuthenticatedUser};

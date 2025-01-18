@@ -1,6 +1,7 @@
 const express = require('express');
 
 const cors = require('cors');
+const path = require('path');
 
 
 const { check } = require('express-validator');
@@ -11,6 +12,7 @@ const estabilishmentController = require('./Controllers/EstabilishmentController
 const authController = require('./Controllers/AuthController');
 const upload = require('./upload');
 const app = express();
+const Estabilishment = require('./models/Estabilishment');
 
 
 const port = 3001;
@@ -27,7 +29,7 @@ const admin = async (req, res, next) => {
   if (!token) {
     return res.status(401).json({ message: 'Token não fornecido.' });
   }
-  const establishment = await Establishment.findOne({
+  const establishment = await Estabilishment.findOne({
     where: { user_id: user.id }
   });
 
@@ -82,7 +84,7 @@ app.post(
 );
 
 
-app.post(
+app.get(
   "/estabilishment",
   estabilishmentController.getAllEstabilishments
 );
@@ -94,11 +96,13 @@ app.post(
   estabilishmentController.createProduct
 );
 app.post(
-  '/estabilishment/create-qrcode',
-  admin,
+  '/estabilishment/:id/create-qrcode',
+ 
   estabilishmentController.createQrcode
 );
 app.get("/estabilishment/:id", estabilishmentController.getEstabilishmentById);
+
+app.get('/auth/user', authController.getAuthenticatedUser);
 
 sequelize.sync().then(() => {
   console.log('Banco de dados sincronizado');
