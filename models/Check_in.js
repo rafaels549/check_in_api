@@ -32,7 +32,7 @@ active:{
 User.hasMany(CheckIn, { foreignKey: "user_id", as: "check_ins" }); 
 CheckIn.belongsTo(User);
 
-Establishment.hasMany(CheckIn, { foreignKey: "establishment_id", as: "check_ins" });
+Estabilishment.hasMany(CheckIn, { foreignKey: "establishment_id", as: "check_ins" });
 CheckIn.belongsTo(Estabilishment); 
 
 module.exports = CheckIn;
