@@ -178,7 +178,7 @@ const getAllEstabilishments = async (req, res) => {
       }
   
       // Criar o novo QR Code
-      const qrData = `ID: ${id}\nEndereço: ${endereco}\nNome: ${nome}`;
+      const qrData = ``;
       const qrCodeImage = await QRCode.toDataURL(qrData);
   
       const newQrCode = await QrCode.create({
@@ -230,7 +230,8 @@ const getAllEstabilishments = async (req, res) => {
   };
   
   const createCheckIn = async (req, res) => {
-         const {user_id, estabilishment_id} = req.params;
+         const {estabilishment_id} = req.params;
+         const{user_id} = req.body
    try{
          const newCheckIn = CheckIn.create({
                 user_id : user_id,
